@@ -1,56 +1,66 @@
-import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { FlatList, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
-export default class App extends React.Component {
+import { ListItem, Avatar } from 'react-native-elements';
+
+export default class App extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             loading: false,
-            listPokemon: [],
-            url: 'https://pokeapi.co/api/v2/pokemon/'
+            listUsers: [],
         }
     }
 
     componentDidMount() {
-        this.getPokemon();
+        this.getUserRandom();
     }
 
-    getPokemon = () => {
+    getUserRandom = () => {
+        const url = 'https://randomuser.me/api/?seed=1&page=1&results=20';
 
         this.setState({ loading: true })
-        fetch(this.state.url)
+        fetch(url)
             .then(res => res.json())
             .then(res => {
                 this.setState({
-                    listPokemon: res.results,
-                    url: res.next,
-                    loading:false
+                    listUsers: res.results,
+                    loading: false
                 })
 
             });
     };
 
     render() {
-        if (this.state.loading) {
-            return (
-                <View style={styles.container}>
-                    <Text>Descargando pokemon!</Text>
-                </View>
-            );
-        }
+        //if (this.state.loading) {
+        //    return (
+        //        <View style={styles.container}>
+        //            <Text>Descargando usuarios!</Text>
+        //        </View>
+        //    );
+        //}
 
         return (
-            <View style={{ flex: 1, paddingTop: 50, paddingLeft: 5 }} >
-                <FlatList
-                    data={this.state.listPokemon}
-                    renderItem={
-                        ({ item }) => <Text>{item.name}</Text>
-                    }
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
+            <FlatList
+                data={this.state.listUsers}
+                renderItem={({ item }) => (
+                    <ListItem bottomDivider>
+                        <Avatar
+                            rounded
+                            source={{ uri: item.picture.thumbnail }}
+                        />
+                        <ListItem.Content>
+                            <ListItem.Title>{item.name.first}</ListItem.Title>
+                            <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
+                        </ListItem.Content>
+                        <ListItem.Chevron />
+                    </ListItem>
+                )}
+                keyExtractor={item => item.email}
+            />
+
         );
     }
 }
